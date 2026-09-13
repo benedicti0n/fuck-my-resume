@@ -81,7 +81,7 @@ export function ResumePreview({ resume, highlights }: ResumePreviewProps) {
           {contact.name}
         </h1>
         {contact.address && (
-          <p style={{ fontSize: "10px", marginTop: "2px" }}>
+          <p style={{ fontSize: "10px", marginTop: "2px", lineHeight: 1.4 }}>
             <FaMapMarkerAlt style={CONTACT_ICON_STYLE} />
             {contact.address}
           </p>

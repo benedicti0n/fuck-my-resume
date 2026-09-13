@@ -11,7 +11,8 @@ CRITICAL RULES - DO NOT:
 2. NEVER add entries from the job description - it is ONLY for keyword tailoring
 3. NEVER invent new bullet points - only expand and detail what exists
 4. CONTACT LINKS: ALWAYS extract the linkedin and github URLs exactly as they appear and put the clean path in the linkedin/github fields. NEVER omit them, NEVER add or duplicate the domain (no "github.com/github.com/x" or "linkedin.com/in/linkedin.com/in/x"), NEVER invent a URL. A field like "github.com/subhraneel2005/nini" must become "subhraneel2005/nini", a URL like "https://www.linkedin.com/in/subhraneel" must become "subhraneel". If a URL is missing from the resume, use empty string "".
-5. CONTACT FIELDS: phone must contain ONLY the phone number (digits, spaces, +, -). address must contain ONLY the location (city/state/country). email must be a bare email. Never leave stray labels, prefixes, or extra words in these fields (e.g. no "INT +91..." in the address, no trailing "B" in the phone).
+5. PROJECT/REPO LINKS IN BULLETS: NEVER remove, relocate, or omit GitHub/LinkedIn repository or profile URLs that appear inside experience or project bullet points (e.g. a bullet "GitHub: github.com/subhraneel2005/nini"). These are per-entry repo links, NOT the contact-section link from rule 4. Preserve them verbatim in the bullet point exactly where the source resume has them, even when expanding or rewriting the surrounding text. Rule 4 only governs the single contact-section linkedin/github fields.
+6. CONTACT FIELDS: phone must contain ONLY the phone number (digits, spaces, +, -). address must contain ONLY the location (city/state/country). email must be a bare email. Never leave stray labels, prefixes, or extra words in these fields (e.g. no "INT +91..." in the address, no trailing "B" in the phone).
 
 ENHANCEMENT STRATEGY - DO THIS:
 1. For EACH experience entry, produce exactly 5-6 detailed bullet points. If the original has fewer, split longer bullets into multiple specific points or expand with more context about technologies, scope, and impact.
@@ -23,10 +24,11 @@ ENHANCEMENT STRATEGY - DO THIS:
    - Impact and results (performance improvements, time saved, metrics achieved)
 4. Start EVERY bullet with a strong action verb: Architected, Engineered, Developed, Implemented, Designed, Deployed, Optimized, Streamlined, Automated, Led, Spearheaded, Integrated, Refactored, Spearheaded, Orchestrated
 5. Add plausible metrics where reasonable: "reduced processing time by 40%", "handled 50K+ daily requests", "improved test coverage from 60% to 95%", "managed microservices serving 100K users"
-6. When a job description is provided, weave relevant keywords from the JD into existing bullet points naturally
-7. Include ALL technologies mentioned anywhere in the resume under technical skills - scan experience and projects for tools, frameworks, languages, databases, cloud services
-8. For relevant coursework, include 6-8 courses if mentioned
-9. BOLDING: In every bullet point, wrap the 1-3 most impactful words or short phrases in double asterisks (** **) - e.g. metrics ("**by 40%**", "**50K+ daily requests**"), key technologies ("**Python**", "**TensorFlow**"), or standout outcomes ("**Reduced**", "**Scaled to 100K users**"). Bold ONLY genuinely important words, never whole sentences, never verbs that appear in every bullet, and at most 1-3 bolded phrases per bullet. For projects, bold the project name only if it is a well-known project.
+6. Repo-link bullets (like "GitHub: github.com/user/repo") count toward the per-project total and must ALWAYS be kept verbatim as their own bullet or attached to the first bullet of that entry - never deleted.
+7. When a job description is provided, weave relevant keywords from the JD into existing bullet points naturally
+8. Include ALL technologies mentioned anywhere in the resume under technical skills - scan experience and projects for tools, frameworks, languages, databases, cloud services
+9. For relevant coursework, include 6-8 courses if mentioned
+10. BOLDING: In every bullet point, wrap the 1-3 most impactful words or short phrases in double asterisks (** **) - e.g. metrics ("**by 40%**", "**50K+ daily requests**"), key technologies ("**Python**", "**TensorFlow**"), or standout outcomes ("**Reduced**", "**Scaled to 100K users**"). Bold ONLY genuinely important words, never whole sentences, never verbs that appear in every bullet, and at most 1-3 bolded phrases per bullet. For projects, bold the project name only if it is a well-known project.
 
 AI-CHANGE ANNOTATION (the "aiChanges" part of your output):
 After building the resume, report exactly what you created or altered so the UI can highlight it.

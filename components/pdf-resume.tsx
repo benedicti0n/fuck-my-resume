@@ -52,14 +52,40 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     letterSpacing: 1,
     textTransform: "uppercase",
+    lineHeight: 1.3,
   },
   headerLine: {
     fontSize: 9,
-    marginTop: 2,
+    marginTop: 4,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "flex-start",
+  },
+  contactLine: {
+    fontSize: 8,
+    marginTop: 4,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "flex-start",
   },
   contactIcon: {
     fontSize: 8,
     marginRight: 2,
+    marginTop: 1,
+  },
+  headerText: {
+    fontSize: 9,
+  },
+  contactText: {
+    fontSize: 8,
+  },
+  contactSep: {
+    width: 6,
+    fontSize: 8,
+  },
+  link: {
+    color: "#000000",
+    textDecoration: "none",
   },
   section: {
     marginTop: 8,
@@ -135,42 +161,51 @@ export function PdfResume({ resume }: PdfResumeProps) {
   const contactParts: React.ReactNode[] = []
   if (contact.phone) {
     contactParts.push(
-      <Text key="phone" style={{ flexDirection: "row", alignItems: "center" }}>
+      <React.Fragment key="phone">
         <Text style={[styles.contactIcon, { fontFamily: FA_ICONS.phone.family }]}>
           {FA_ICONS.phone.glyph}
         </Text>
-        <Link src={`tel:${contact.phone}`}>{contact.phone}</Link>
-      </Text>
+        <Text style={styles.contactText}>{" "}{contact.phone}</Text>
+      </React.Fragment>
     )
   }
   if (contact.email) {
     contactParts.push(
-      <Text key="email" style={{ flexDirection: "row", alignItems: "center" }}>
+      <React.Fragment key="email">
+        <Text style={styles.contactSep}>{"   "}</Text>
         <Text style={[styles.contactIcon, { fontFamily: FA_ICONS.envelope.family }]}>
           {FA_ICONS.envelope.glyph}
         </Text>
-        <Link src={`mailto:${contact.email}`}>{contact.email}</Link>
-      </Text>
+        <Link src={`mailto:${contact.email}`} style={[styles.link, styles.contactText]}>
+          {" "}{contact.email}
+        </Link>
+      </React.Fragment>
     )
   }
   if (parsedLinkedin.url && parsedLinkedin.display) {
     contactParts.push(
-      <Text key="linkedin" style={{ flexDirection: "row", alignItems: "center" }}>
+      <React.Fragment key="linkedin">
+        <Text style={styles.contactSep}>{"   "}</Text>
         <Text style={[styles.contactIcon, { fontFamily: FA_ICONS.linkedin.family }]}>
           {FA_ICONS.linkedin.glyph}
         </Text>
-        <Link src={parsedLinkedin.url}>{parsedLinkedin.display}</Link>
-      </Text>
+        <Link src={parsedLinkedin.url} style={[styles.link, styles.contactText]}>
+          {" "}{parsedLinkedin.display}
+        </Link>
+      </React.Fragment>
     )
   }
   if (parsedGithub.url && parsedGithub.display) {
     contactParts.push(
-      <Text key="github" style={{ flexDirection: "row", alignItems: "center" }}>
+      <React.Fragment key="github">
+        <Text style={styles.contactSep}>{"   "}</Text>
         <Text style={[styles.contactIcon, { fontFamily: FA_ICONS.github.family }]}>
           {FA_ICONS.github.glyph}
         </Text>
-        <Link src={parsedGithub.url}>{parsedGithub.display}</Link>
-      </Text>
+        <Link src={parsedGithub.url} style={[styles.link, styles.contactText]}>
+          {" "}{parsedGithub.display}
+        </Link>
+      </React.Fragment>
     )
   }
 
@@ -181,22 +216,17 @@ export function PdfResume({ resume }: PdfResumeProps) {
         <View style={styles.header}>
           <Text style={styles.name}>{contact.name}</Text>
           {contact.address && (
-            <Text style={{ ...styles.headerLine, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+            <View style={styles.headerLine}>
               <Text style={[styles.contactIcon, { fontFamily: FA_ICONS.mapMarker.family }]}>
                 {FA_ICONS.mapMarker.glyph}
               </Text>
-              <Text>{contact.address}</Text>
-            </Text>
+              <Text style={styles.headerText}>{" "}{contact.address}</Text>
+            </View>
           )}
           {contactParts.length > 0 && (
-            <Text style={styles.headerLine}>
-              {contactParts.map((part, i) => (
-                <React.Fragment key={i}>
-                  {i > 0 && <Text>{" ~ "}</Text>}
-                  {part}
-                </React.Fragment>
-              ))}
-            </Text>
+            <View style={styles.contactLine}>
+              {contactParts}
+            </View>
           )}
         </View>
 
