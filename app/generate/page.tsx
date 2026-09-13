@@ -33,6 +33,7 @@ import {
   StepperTrigger,
 } from "@/components/reui/stepper"
 import { Navbar } from "@/components/navbar"
+import { TemplateSelectStep } from "@/components/steps/template-select-step"
 import { AuthStep } from "@/components/steps/auth-step"
 import { ResumeUploadStep } from "@/components/steps/resume-upload-step"
 import { JDInputStep } from "@/components/steps/jd-input-step"
@@ -40,17 +41,19 @@ import { LaTeXPreview } from "@/components/latex-preview"
 import { OutreachPreview } from "@/components/outreach-preview"
 import { extractTextFromPDF, extractContactLinksFromPDF } from "@/lib/pdf-parser"
 import { generateLatex } from "@/lib/latex-renderer"
+import type { ResumeTemplateId } from "@/lib/resume-templates"
 import { renderColdEmail, renderColdDM } from "@/lib/template-renderer"
 import type { Resume } from "@/lib/schemas/resume"
 import type { Highlights } from "@/lib/highlights"
 import type { ColdEmail, ColdDM } from "@/lib/schemas/outreach"
 
-const steps = [1, 2, 3]
+const steps = [1, 2, 3, 4]
 
 export default function GeneratePage() {
   const { data: session } = authClient.useSession()
   const isSignedIn = !!session
   const [currentStep, setCurrentStep] = useState(1)
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
   const [jd, setJd] = useState("")
   const [resumeFile, setResumeFile] = useState<File | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -120,8 +123,11 @@ export default function GeneratePage() {
       setResumeData(resume)
       setHighlights(highlights || null)
 
-      // Step 3: Generate LaTeX
-      const latex = generateLatex(resume)
+      // Step 3: Generate LaTeX using the selected template
+      const latex = generateLatex(
+        resume,
+        (selectedTemplate as ResumeTemplateId) || "jake-resume"
+      )
       setLatexCode(latex)
 
       // Step 4: Generate outreach (if JD provided)
@@ -147,7 +153,6 @@ export default function GeneratePage() {
       }
 
       // Move to result view
-      setCurrentStep(4)
     } catch (err) {
       setError({
         message: err instanceof Error ? err.message : "Something went wrong",
@@ -156,7 +161,7 @@ export default function GeneratePage() {
     } finally {
       setIsProcessing(false)
     }
-  }, [resumeFile, jd])
+  }, [resumeFile, jd, selectedTemplate])
 
   const handleDownloadTeX = useCallback(() => {
     if (!latexCode) return
@@ -173,15 +178,15 @@ export default function GeneratePage() {
   }, [latexCode])
 
   const handleBackToEdit = useCallback(() => {
-    setCurrentStep(3)
+    setCurrentStep(steps.length)
     setLatexCode(null)
     setColdEmail(null)
     setColdDM(null)
     setHighlights(null)
-  }, [])
+  }, [steps.length])
 
   // Result view
-  if (currentStep === 4 && latexCode && resumeData) {
+  if (latexCode && resumeData) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-4 pt-16">
         <Navbar />
@@ -244,11 +249,20 @@ export default function GeneratePage() {
 
             <StepperContent value={2}>
               <CardContent>
-                <ResumeUploadStep onFileSelect={handleFileSelect} />
+                <TemplateSelectStep
+                  value={selectedTemplate}
+                  onChange={setSelectedTemplate}
+                />
               </CardContent>
             </StepperContent>
 
             <StepperContent value={3}>
+              <CardContent>
+                <ResumeUploadStep onFileSelect={handleFileSelect} />
+              </CardContent>
+            </StepperContent>
+
+            <StepperContent value={4}>
               <CardContent>
                 <JDInputStep value={jd} onChange={setJd} />
               </CardContent>
@@ -264,10 +278,13 @@ export default function GeneratePage() {
               <ArrowLeft02Icon size={14} className="mr-1.5 shrink-0" />
               Back
             </Button>
-            {effectiveStep < 3 ? (
+            {effectiveStep < 4 ? (
               <Button
                 onClick={() => setCurrentStep((s) => s + 1)}
-                disabled={effectiveStep >= 3}
+                disabled={
+                  effectiveStep >= 4 ||
+                  (effectiveStep === 2 && !selectedTemplate)
+                }
               >
                 Next
                 <ArrowRight02Icon size={14} className="ml-1.5 shrink-0" />

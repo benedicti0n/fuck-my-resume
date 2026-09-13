@@ -4,6 +4,13 @@ import type { Resume } from "@/lib/schemas/resume"
 import { parseContactUrl } from "@/lib/contact-links"
 import { hasHighlights, type Highlights } from "@/lib/highlights"
 import type { EntryHighlights } from "@/lib/highlights"
+import {
+  FaMapMarkerAlt,
+  FaPhoneAlt,
+  FaEnvelope,
+  FaLinkedin,
+  FaGithub,
+} from "react-icons/fa"
 
 interface ResumePreviewProps {
   resume: Resume
@@ -26,6 +33,16 @@ const ADDED_CHIP_STYLE: React.CSSProperties = {
   backgroundColor: "rgba(245, 158, 11, 0.22)",
   borderBottom: "2px solid #d97706",
   padding: "0 2px",
+}
+
+const CONTACT_ICON_STYLE: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  fontSize: "9px",
+  marginRight: "3px",
+  verticalAlign: "middle",
+  position: "relative",
+  top: "-1px",
 }
 
 export function ResumePreview({ resume, highlights }: ResumePreviewProps) {
@@ -64,16 +81,39 @@ export function ResumePreview({ resume, highlights }: ResumePreviewProps) {
           {contact.name}
         </h1>
         {contact.address && (
-          <p style={{ fontSize: "10px", marginTop: "2px" }}>{contact.address}</p>
+          <p style={{ fontSize: "10px", marginTop: "2px" }}>
+            <FaMapMarkerAlt style={CONTACT_ICON_STYLE} />
+            {contact.address}
+          </p>
         )}
-        <p style={{ fontSize: "10px", marginTop: "2px" }}>
-          {contact.phone && <span>{contact.phone}</span>}
-          {contact.phone && contact.email && <span> ~ </span>}
-          {contact.email && <span>{contact.email}</span>}
-          {contact.email && parsedLinkedin.display && <span> ~ </span>}
-          {parsedLinkedin.display && <span>{parsedLinkedin.display}</span>}
-          {parsedLinkedin.display && parsedGithub.display && <span> ~ </span>}
-          {parsedGithub.display && <span>{parsedGithub.display}</span>}
+        <p style={{ fontSize: "10px", marginTop: "2px", lineHeight: 1.7 }}>
+          {contact.phone && (
+            <span>
+              <FaPhoneAlt style={CONTACT_ICON_STYLE} />
+              {contact.phone}
+            </span>
+          )}
+          {contact.phone && contact.email && <span>{"   "}</span>}
+          {contact.email && (
+            <span>
+              <FaEnvelope style={CONTACT_ICON_STYLE} />
+              {contact.email}
+            </span>
+          )}
+          {contact.email && parsedLinkedin.display && <span>{"   "}</span>}
+          {parsedLinkedin.display && (
+            <span>
+              <FaLinkedin style={CONTACT_ICON_STYLE} />
+              {parsedLinkedin.display}
+            </span>
+          )}
+          {parsedLinkedin.display && parsedGithub.display && <span>{"   "}</span>}
+          {parsedGithub.display && (
+            <span>
+              <FaGithub style={CONTACT_ICON_STYLE} />
+              {parsedGithub.display}
+            </span>
+          )}
         </p>
       </div>
 

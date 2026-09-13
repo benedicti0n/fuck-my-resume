@@ -8,9 +8,32 @@ import {
   View,
   Link,
   StyleSheet,
+  Font,
 } from "@react-pdf/renderer"
 import type { Resume } from "@/lib/schemas/resume"
 import { parseContactUrl } from "@/lib/contact-links"
+
+// FontAwesome 5 glyphs used by the resume templates' contact headers. The
+// LaTeX templates pull these from the `fontawesome5` package; here we embed
+// the same glyphs directly so the downloaded PDF matches the generated .tex.
+export const FA_ICONS = {
+  mapMarker: { family: "FontAwesomeSolid", glyph: "\uF041" },
+  phone: { family: "FontAwesomeSolid", glyph: "\uF095" },
+  envelope: { family: "FontAwesomeSolid", glyph: "\uF0E0" },
+  linkedin: { family: "FontAwesomeBrands", glyph: "\uF08C" },
+  github: { family: "FontAwesomeBrands", glyph: "\uF09B" },
+} as const
+
+export type FaIconKey = keyof typeof FA_ICONS
+
+Font.register({
+  family: "FontAwesomeSolid",
+  src: "/fonts/fa-solid-900.ttf",
+})
+Font.register({
+  family: "FontAwesomeBrands",
+  src: "/fonts/fa-brands-400.ttf",
+})
 
 const styles = StyleSheet.create({
   page: {
@@ -33,6 +56,10 @@ const styles = StyleSheet.create({
   headerLine: {
     fontSize: 9,
     marginTop: 2,
+  },
+  contactIcon: {
+    fontSize: 8,
+    marginRight: 2,
   },
   section: {
     marginTop: 8,
@@ -108,30 +135,42 @@ export function PdfResume({ resume }: PdfResumeProps) {
   const contactParts: React.ReactNode[] = []
   if (contact.phone) {
     contactParts.push(
-      <Link key="phone" src={`tel:${contact.phone}`}>
-        {contact.phone}
-      </Link>
+      <Text key="phone" style={{ flexDirection: "row", alignItems: "center" }}>
+        <Text style={[styles.contactIcon, { fontFamily: FA_ICONS.phone.family }]}>
+          {FA_ICONS.phone.glyph}
+        </Text>
+        <Link src={`tel:${contact.phone}`}>{contact.phone}</Link>
+      </Text>
     )
   }
   if (contact.email) {
     contactParts.push(
-      <Link key="email" src={`mailto:${contact.email}`}>
-        {contact.email}
-      </Link>
+      <Text key="email" style={{ flexDirection: "row", alignItems: "center" }}>
+        <Text style={[styles.contactIcon, { fontFamily: FA_ICONS.envelope.family }]}>
+          {FA_ICONS.envelope.glyph}
+        </Text>
+        <Link src={`mailto:${contact.email}`}>{contact.email}</Link>
+      </Text>
     )
   }
   if (parsedLinkedin.url && parsedLinkedin.display) {
     contactParts.push(
-      <Link key="linkedin" src={parsedLinkedin.url}>
-        {parsedLinkedin.display}
-      </Link>
+      <Text key="linkedin" style={{ flexDirection: "row", alignItems: "center" }}>
+        <Text style={[styles.contactIcon, { fontFamily: FA_ICONS.linkedin.family }]}>
+          {FA_ICONS.linkedin.glyph}
+        </Text>
+        <Link src={parsedLinkedin.url}>{parsedLinkedin.display}</Link>
+      </Text>
     )
   }
   if (parsedGithub.url && parsedGithub.display) {
     contactParts.push(
-      <Link key="github" src={parsedGithub.url}>
-        {parsedGithub.display}
-      </Link>
+      <Text key="github" style={{ flexDirection: "row", alignItems: "center" }}>
+        <Text style={[styles.contactIcon, { fontFamily: FA_ICONS.github.family }]}>
+          {FA_ICONS.github.glyph}
+        </Text>
+        <Link src={parsedGithub.url}>{parsedGithub.display}</Link>
+      </Text>
     )
   }
 
@@ -141,7 +180,14 @@ export function PdfResume({ resume }: PdfResumeProps) {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.name}>{contact.name}</Text>
-          {contact.address && <Text style={styles.headerLine}>{contact.address}</Text>}
+          {contact.address && (
+            <Text style={{ ...styles.headerLine, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+              <Text style={[styles.contactIcon, { fontFamily: FA_ICONS.mapMarker.family }]}>
+                {FA_ICONS.mapMarker.glyph}
+              </Text>
+              <Text>{contact.address}</Text>
+            </Text>
+          )}
           {contactParts.length > 0 && (
             <Text style={styles.headerLine}>
               {contactParts.map((part, i) => (

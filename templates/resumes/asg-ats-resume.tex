@@ -1,0 +1,62 @@
+% Pre-amble
+\documentclass[10pt]{article}
+\usepackage[margin=0.58in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fontawesome5}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\definecolor{ink}{HTML}{1E293B}
+\definecolor{accent}{HTML}{0F766E}
+\setlist[itemize]{leftmargin=1.2em,itemsep=1pt,topsep=2pt}
+\titleformat{\section}{\large\bfseries\color{accent}}{}{0pt}{}[\color{accent}\titlerule]
+\titlespacing*{\section}{0pt}{8pt}{4pt}
+\newcommand{\entry}[4]{\textbf{#1}\hfill #2\\\textit{#3}\hfill #4\\}
+\begin{document}
+\begin{center}
+  {\LARGE\bfseries\color{ink} Priya Shah}\\[3pt]
+  \faMapMarker\ Manchester, UK \enspace|\enspace
+  \faPhone\ +44 1234 567890 \enspace|\enspace
+  \href{mailto:priya@example.org}{\faEnvelope\ priya@example.org} \enspace|\enspace
+  \href{https://www.linkedin.com/in/priyashah}{\faLinkedin\ linkedin.com/in/priyashah} \enspace|\enspace
+  \href{https://github.com/priyashah}{\faGithub\ github.com/priyashah}
+\end{center}
+\small
+\section*{Summary}
+Platform engineer who makes data-intensive services dependable in production.
+Seven years of experience designing observable APIs, delivery pipelines, and
+developer tooling for teams that value clear interfaces and short feedback
+loops. Comfortable moving between architecture, implementation, and support.
+\section*{Experience}
+\entry{Northline Systems}{2021--Present}{Platform Engineer}{Manchester, UK}
+\begin{itemize}
+  \item Designed a typed event-ingestion service used by five product teams;
+    reduced failed deliveries by 42\% through idempotency and replay tooling.
+  \item Reworked CI and release checks so every production change reports its
+    test, migration, and rollback evidence in one place.
+\end{itemize}
+\entry{Civic Data Works}{2017--2021}{Software Engineer}{Leeds, UK}
+\begin{itemize}
+  \item Built Python and PostgreSQL services for public-data workflows, with
+    documented schemas and automated contract tests.
+  \item Led incident reviews and paired with analysts to turn recurring manual
+    work into small, maintainable command-line tools.
+\end{itemize}
+\section*{Selected work}
+\entry{Relay}{2024}{Maintainer}{Python, FastAPI, PostgreSQL}
+Open-source toolkit for validating incremental data imports and producing
+machine-readable failure reports.\\[4pt]
+\entry{Compass}{2020}{Technical lead}{Docker, GitHub Actions, Linux}
+Internal deployment template that made health checks, logs, and ownership
+visible before a service reached production.
+\section*{Technical skills}
+\textbf{Languages:} Python, SQL, Bash, TypeScript\\
+\textbf{Systems:} PostgreSQL, Docker, Linux, REST, GitHub Actions\\
+\textbf{Practice:} testing, observability, data modelling, technical writing
+\section*{Education}
+\entry{Northern Institute of Technology}{2013--2017}{BSc Computer Science}{Leeds, UK}
+\end{document}
