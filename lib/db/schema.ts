@@ -108,6 +108,37 @@ export const interviewSessions = pgTable("interview_sessions", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ─── Feedback ───
+
+export const feedback = pgTable("feedback", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name"),
+  image: text("image"),
+  stars: integer("stars").notNull(), // 1-5
+  comment: text("comment").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ─── Feature Requests ───
+
+export const featureRequests = pgTable("feature_requests", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name"),
+  image: text("image"),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  status: text("status").notNull().default("new"), // 'new' | 'planned' | 'shipped' | 'declined'
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // ─── Relations ───
 
 export const userRelations = relations(user, ({ many }) => ({
@@ -115,6 +146,8 @@ export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
   aiSettings: many(aiSettings),
   interviewSessions: many(interviewSessions),
+  feedback: many(feedback),
+  featureRequests: many(featureRequests),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({

@@ -13,6 +13,7 @@ import { Settings01Icon } from "@/components/ui/settings-01";
 import { Login01Icon } from "@/components/ui/login-01";
 import { Logout01Icon } from "@/components/ui/logout-01";
 import { DashboardSquare01Icon } from "@/components/ui/dashboard-square-01";
+import { Star, Lightbulb } from "lucide-react";
 import { Sun03Icon } from "@/components/ui/sun-03";
 import { Moon02Icon } from "@/components/ui/moon-02";
 
@@ -78,6 +79,18 @@ export function Navbar() {
           <Button variant="ghost" size="sm">
             <DashboardSquare01Icon size={14} className="mr-1.5 shrink-0" />
             Leaderboard
+          </Button>
+        </Link>
+        <Link href="/feedback">
+          <Button variant="ghost" size="sm">
+            <Star size={14} className="mr-1.5 shrink-0" />
+            Feedback
+          </Button>
+        </Link>
+        <Link href="/feature-request">
+          <Button variant="ghost" size="sm">
+            <Lightbulb size={14} className="mr-1.5 shrink-0" />
+            Request a feature
           </Button>
         </Link>
         <Link href="/generate">
