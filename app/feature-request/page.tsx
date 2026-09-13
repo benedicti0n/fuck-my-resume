@@ -9,6 +9,36 @@ import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 
 const FEATURE_EMAIL = "subhraneeljobs@gmail.com";
+const FORM_SUBMIT_AJAX = `https://formsubmit.co/ajax/${FEATURE_EMAIL}`;
+
+// FormSubmit's free tier blocks server/datacenter requests (anti-spam), so the
+// email must be sent from the browser. This fires the FormSubmit AJAX POST.
+async function sendFeatureRequestEmail(opts: {
+  title: string;
+  description: string;
+  name: string | null;
+  email: string | null;
+}): Promise<void> {
+  const form = new FormData();
+  form.set("_captcha", "false");
+  form.set("_template", "table");
+  form.set("_subject", `Feature Request: ${opts.title}`);
+  if (opts.email) form.set("_replyto", opts.email);
+  form.set("Name", opts.name ?? "Signed out user");
+  form.set("Email", opts.email ?? "Not provided (signed out)");
+  form.set("Title", opts.title);
+  form.set("Description", opts.description);
+
+  const res = await fetch(FORM_SUBMIT_AJAX, {
+    method: "POST",
+    headers: { Accept: "application/json" },
+    body: form,
+  });
+  const json = await res.json().catch(() => null);
+  if (!res.ok || json?.success !== "true") {
+    throw new Error(json?.message ?? "Couldn't send the request. Try again.");
+  }
+}
 
 export default function FeatureRequestPage() {
   const { data: session } = authClient.useSession();
@@ -26,13 +56,27 @@ export default function FeatureRequestPage() {
     setSubmitting(true);
 
     try {
-      const res = await fetch("/api/feature-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Failed to submit request");
+      // Fire both in parallel. The email is the source of truth; the DB insert
+      // is best-effort. A DB 4xx (validation) still surfaces so the user fixes it.
+      const [dbRes] = await Promise.all([
+        fetch("/api/feature-request", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title, description }),
+        }),
+        sendFeatureRequestEmail({
+          title,
+          description,
+          name: session?.user?.name ?? null,
+          email: session?.user?.email ?? null,
+        }),
+      ]);
+
+      if (dbRes.status >= 400 && dbRes.status < 500) {
+        const json = await dbRes.json().catch(() => null);
+        if (json?.error) throw new Error(json.error);
+      }
+
       setSent(true);
       setTitle("");
       setDescription("");

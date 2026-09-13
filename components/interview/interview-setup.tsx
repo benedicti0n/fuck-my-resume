@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -90,7 +91,14 @@ export function InterviewSetup() {
   }
 
   async function handleStart() {
-    if (!effectiveEngine) return;
+    if (!jd.trim()) {
+      setError("Paste a job description first.");
+      return;
+    }
+    if (!effectiveEngine) {
+      setError("Pick an interviewer voice.");
+      return;
+    }
     setCreating(true);
     setError(null);
     try {
@@ -128,9 +136,9 @@ export function InterviewSetup() {
     return (
       <Card>
         <CardContent className="py-8">
-          <p className="flex items-center justify-center gap-2 text-center text-muted-foreground">
+          <p className="flex items-center justify-center gap-2 text-center text-muted-foreground" role="status" aria-live="polite">
             <RefreshIcon size={16} className="animate-spin" />
-            Loading...
+            Loading…
           </p>
         </CardContent>
       </Card>
@@ -150,9 +158,9 @@ export function InterviewSetup() {
           <p className="text-sm text-muted-foreground">
             {INTERVIEW_NOT_SUPPORTED_BANNER}
           </p>
-          <Button onClick={() => router.push("/settings")}>
-            Go to Settings
-          </Button>
+          <Link href="/settings">
+            <Button>Go to Settings</Button>
+          </Link>
         </CardContent>
       </Card>
     );
@@ -182,21 +190,28 @@ export function InterviewSetup() {
             id="jd"
             value={jd}
             onChange={(e) => setJd(e.target.value)}
-            placeholder="Paste the job description you're preparing for..."
+            placeholder="Paste the job description you're preparing for…"
             rows={6}
             className="resize-y"
           />
         </div>
 
         <div className="space-y-2">
-          <span className="text-sm font-medium">Difficulty</span>
-          <div className="flex flex-wrap gap-2">
+          <span className="text-sm font-medium" id="difficulty-label">
+            Difficulty
+          </span>
+          <div
+            className="flex flex-wrap gap-2"
+            role="group"
+            aria-labelledby="difficulty-label"
+          >
             {INTERVIEW_DIFFICULTIES.map((d) => (
               <button
                 key={d.id}
                 type="button"
                 onClick={() => setDifficulty(d.id)}
-                className={`rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                aria-pressed={difficulty === d.id}
+                className={`rounded-md border px-3 py-1.5 text-sm transition-colors focus-visible:ring-3 focus-visible:ring-ring/30 focus-visible:outline-none ${
                   difficulty === d.id
                     ? "border-primary bg-primary text-primary-foreground"
                     : "bg-background hover:bg-muted"
@@ -212,14 +227,21 @@ export function InterviewSetup() {
         </div>
 
         <div className="space-y-2">
-          <span className="text-sm font-medium">Duration (minutes)</span>
-          <div className="flex flex-wrap gap-2">
+          <span className="text-sm font-medium" id="duration-label">
+            Duration (minutes)
+          </span>
+          <div
+            className="flex flex-wrap gap-2"
+            role="group"
+            aria-labelledby="duration-label"
+          >
             {INTERVIEW_DURATIONS.map((d) => (
               <button
                 key={d}
                 type="button"
                 onClick={() => setDurationMinutes(d)}
-                className={`rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                aria-pressed={durationMinutes === d}
+                className={`rounded-md border px-3 py-1.5 text-sm transition-colors focus-visible:ring-3 focus-visible:ring-ring/30 focus-visible:outline-none ${
                   durationMinutes === d
                     ? "border-primary bg-primary text-primary-foreground"
                     : "bg-background hover:bg-muted"
@@ -232,14 +254,21 @@ export function InterviewSetup() {
         </div>
 
         <div className="space-y-2">
-          <span className="text-sm font-medium">Interviewer Voice</span>
-          <div className="flex flex-wrap gap-2">
+          <span className="text-sm font-medium" id="voice-label">
+            Interviewer Voice
+          </span>
+          <div
+            className="flex flex-wrap gap-2"
+            role="group"
+            aria-labelledby="voice-label"
+          >
             {availableEngines.map((eng) => (
               <button
                 key={eng}
                 type="button"
                 onClick={() => setVoiceEngine(eng)}
-                className={`rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                aria-pressed={effectiveEngine === eng}
+                className={`rounded-md border px-3 py-1.5 text-sm transition-colors focus-visible:ring-3 focus-visible:ring-ring/30 focus-visible:outline-none ${
                   effectiveEngine === eng
                     ? "border-primary bg-primary text-primary-foreground"
                     : "bg-background hover:bg-muted"
@@ -266,8 +295,10 @@ export function InterviewSetup() {
                 id="seed"
                 value={seed}
                 onChange={(e) => setSeed(e.target.value)}
-                placeholder="random"
-                className="w-full rounded-md border bg-background px-3 py-2 font-mono text-sm"
+                placeholder="random or your own…"
+                autoComplete="off"
+                spellCheck={false}
+                className="w-full rounded-md border bg-background px-3 py-2 font-mono text-sm transition-[border-color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 focus-visible:outline-none"
               />
             </div>
             <Button
@@ -276,8 +307,9 @@ export function InterviewSetup() {
               type="button"
               onClick={handleRandomize}
               title="Randomize seed"
+              aria-label="Randomize seed"
             >
-              <MagicWand01Icon size={16} className="shrink-0" />
+              <MagicWand01Icon size={16} className="shrink-0" aria-hidden="true" />
             </Button>
           </div>
 
@@ -321,14 +353,25 @@ export function InterviewSetup() {
           )}
         </div>
 
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && (
+          <p role="alert" aria-live="polite" className="text-sm text-destructive">
+            {error}
+          </p>
+        )}
 
         <div className="flex justify-end">
           <Button
             onClick={handleStart}
-            disabled={creating || !jd.trim() || !effectiveEngine}
+            disabled={creating}
           >
-            {creating ? "Generating world..." : "Start Interview"}
+            {creating ? (
+              <>
+                <RefreshIcon size={16} className="animate-spin shrink-0" />
+                Generating world…
+              </>
+            ) : (
+              "Start Interview"
+            )}
           </Button>
         </div>
       </CardContent>

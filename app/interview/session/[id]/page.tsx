@@ -103,6 +103,7 @@ export default function InterviewSessionPage() {
   const [error, setError] = useState<string | null>(null);
   const [modelStage, setModelStage] = useState("");
   const [showCallGuide, setShowCallGuide] = useState(false);
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [downloads, setDownloads] = useState<{
     voice?: { loaded: number; total: number };
     stt?: { loaded: number; total: number };
@@ -507,8 +508,12 @@ export default function InterviewSessionPage() {
 
   if (status === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">Loading interview...</p>
+      <div
+        className="flex min-h-screen items-center justify-center"
+        role="status"
+        aria-live="polite"
+      >
+        <p className="text-muted-foreground">Loading interview…</p>
       </div>
     );
   }
@@ -558,7 +563,7 @@ export default function InterviewSessionPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={completeInterview}
+                onClick={() => setShowEndConfirm(true)}
                 disabled={status === "assistant"}
               >
                 <Logout01Icon size={14} className="mr-1.5 shrink-0" />
@@ -585,7 +590,7 @@ export default function InterviewSessionPage() {
                 </p>
                 <div className="h-1 w-20 overflow-hidden rounded-full bg-muted">
                   <div
-                    className="h-full rounded-full bg-primary transition-all"
+                    className="h-full rounded-full bg-primary transition-[width]"
                     style={{ width: `${Math.max(0, Math.min(1, percent)) * 100}%` }}
                   />
                 </div>
@@ -675,13 +680,18 @@ export default function InterviewSessionPage() {
                   onPointerUp={handlePressEnd}
                   onPointerLeave={handlePressEnd}
                   disabled={!["listening", "recording"].includes(status)}
-                  className={`flex size-24 items-center justify-center rounded-full text-white shadow-lg transition-all ${
+                  aria-label={
+                    status === "recording"
+                      ? "Release to stop recording"
+                      : "Press and hold to speak"
+                  }
+                  className={`flex size-24 items-center justify-center rounded-full text-white shadow-lg transition-[background-color,transform,opacity] focus-visible:ring-3 focus-visible:ring-ring/30 focus-visible:outline-none ${
                     status === "recording"
                       ? "bg-destructive scale-105"
                       : "bg-primary hover:bg-primary/90 disabled:opacity-50"
                   }`}
                 >
-                  {status === "recording" ? <PauseIcon size={30} className="shrink-0" /> : <Call02Icon size={32} className="shrink-0" />}
+                  {status === "recording" ? <PauseIcon size={30} className="shrink-0" aria-hidden="true" /> : <Call02Icon size={32} className="shrink-0" aria-hidden="true" />}
                 </button>
               )}
               <div className="min-h-5 text-center text-sm text-muted-foreground">
@@ -691,8 +701,38 @@ export default function InterviewSessionPage() {
           </>
         )}
 
-        {error && <p className="text-center text-sm text-destructive">{error}</p>}
+        {error && (
+        <p role="alert" aria-live="polite" className="text-center text-sm text-destructive">
+          {error}
+        </p>
+      )}
       </main>
+
+      <Dialog open={showEndConfirm} onOpenChange={setShowEndConfirm}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>End the interview?</DialogTitle>
+            <DialogDescription>
+              The interview will be graded and saved, and you can&apos;t answer
+              any more questions after this.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setShowEndConfirm(false)}>
+              Keep going
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setShowEndConfirm(false);
+                void completeInterview();
+              }}
+            >
+              End Interview
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showCallGuide} onOpenChange={(o) => !o && dismissCallGuide()}>
         <DialogContent className="max-w-sm">
@@ -747,7 +787,7 @@ function DownloadBar({
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-muted">
         <div
-          className="h-full rounded-full bg-primary transition-all"
+          className="h-full rounded-full bg-primary transition-[width]"
           style={{ width: `${pct}%` }}
         />
       </div>

@@ -21,8 +21,8 @@ export default function InterviewPage() {
 
   if (isPending || !ready) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+      <div className="flex min-h-screen items-center justify-center" role="status" aria-live="polite">
+        <p className="text-muted-foreground">Loading…</p>
       </div>
     );
   }

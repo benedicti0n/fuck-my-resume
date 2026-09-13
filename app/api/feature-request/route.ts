@@ -10,11 +10,9 @@ async function getSession(request: NextRequest) {
   });
 }
 
-const FEATURE_EMAIL = "subhraneeljobs@gmail.com";
-const FORM_SUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${FEATURE_EMAIL}`;
-
-// POST — submit a feature request; stored in DB and emailed to the owner's
-// inbox via FormSubmit (an AJAX submit, so the browser never leaves the app).
+// POST — validate + store a feature request. The FormSubmit email itself is
+// fired from the browser (FormSubmit blocks server/datacenter IPs), using the
+// signed-in user's email as Reply-To so replies reach them.
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const title = typeof body?.title === "string" ? body.title.trim() : "";
@@ -58,44 +56,5 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const form = new FormData();
-  form.set("_captcha", "false");
-  form.set("_template", "table");
-  form.set("_subject", `Feature Request: ${title}`);
-  if (userEmail) form.set("_replyto", userEmail);
-  form.set("Name", userName ?? "Signed out user");
-  form.set("Email", userEmail ?? "Not provided (signed out)");
-  form.set("Title", title);
-  form.set("Description", description);
-
-  const headers = new Headers({ Accept: "application/json" });
-  const origin = request.headers.get("origin");
-  const referer = request.headers.get("referer");
-  if (origin) headers.set("Origin", origin);
-  if (referer) headers.set("Referer", referer);
-
-  const res = await fetch(FORM_SUBMIT_ENDPOINT, {
-    method: "POST",
-    body: form,
-    headers,
-  });
-
-  const json = await res.json().catch(() => null);
-  if (!res.ok || json?.success !== "true") {
-    const message =
-      json?.message ??
-      "Couldn't send the request. Try again.";
-    if (json?.message?.includes("Activation")) {
-      return NextResponse.json(
-        {
-          error:
-            "This form hasn't been activated yet. Check subhraneeljobs@gmail.com for the 'Activate Form' email from FormSubmit and click the link, then try again.",
-        },
-        { status: 502 }
-      );
-    }
-    return NextResponse.json({ error: message }, { status: 502 });
-  }
-
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, email: userEmail, name: userName });
 }
