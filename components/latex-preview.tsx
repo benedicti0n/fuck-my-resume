@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { pdf } from "@react-pdf/renderer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,6 +11,7 @@ import { CloudDownloadIcon } from "@/components/ui/cloud-download"
 import { Copy01Icon } from "@/components/ui/copy-01"
 import { CircleCheckIcon } from "@/components/ui/circle-check"
 import { RefreshIcon } from "@/components/ui/refresh"
+import { Robot01Icon } from "@/components/ui/robot-01"
 import { ResumePreview } from "@/components/resume-preview"
 import { PdfResume } from "@/components/pdf-resume"
 import type { Resume } from "@/lib/schemas/resume"
@@ -19,13 +21,16 @@ interface LaTeXPreviewProps {
   latexCode: string
   resumeData: Resume
   highlights?: Highlights | null
+  jobDescription?: string
 }
 
 export function LaTeXPreview({
   latexCode,
   resumeData,
   highlights,
+  jobDescription,
 }: LaTeXPreviewProps) {
+  const router = useRouter()
   const [copied, setCopied] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
 
@@ -33,6 +38,11 @@ export function LaTeXPreview({
     await navigator.clipboard.writeText(latexCode)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleMockInterview = () => {
+    sessionStorage.setItem("fmr:pending-jd", jobDescription ?? "")
+    router.push("/interview")
   }
 
   const handleDownloadPDF = async () => {
@@ -57,9 +67,9 @@ export function LaTeXPreview({
 
   return (
     <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-col items-center space-y-3 pb-2">
         <CardTitle className="text-lg">Generated Resume</CardTitle>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap justify-center gap-2">
           <Button variant="outline" size="sm" onClick={handleCopy}>
             {copied ? (
               <CircleCheckIcon size={14} className="mr-2 shrink-0" />
@@ -75,6 +85,20 @@ export function LaTeXPreview({
               <CloudDownloadIcon size={14} className="mr-2 shrink-0" />
             )}
             {isDownloading ? "Compiling..." : "Download PDF"}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleMockInterview}
+            disabled={!jobDescription?.trim()}
+            title={
+              !jobDescription?.trim()
+                ? "Add a job description to generate a tailored resume to run a mock interview"
+                : "Run a mock interview for this job"
+            }
+          >
+            <Robot01Icon size={14} className="mr-2 shrink-0" />
+            Give AI Mock interview for this role
           </Button>
         </div>
       </CardHeader>

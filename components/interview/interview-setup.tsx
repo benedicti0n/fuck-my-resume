@@ -55,6 +55,10 @@ export function InterviewSetup() {
   }, []);
 
   async function loadSettings() {
+    const pendingJd = sessionStorage.getItem("fmr:pending-jd");
+    if (pendingJd) {
+      sessionStorage.removeItem("fmr:pending-jd");
+    }
     try {
       const res = await fetch("/api/settings/ai-provider");
       const data = await res.json();
@@ -64,6 +68,9 @@ export function InterviewSetup() {
         const available = enginesForProvider(provider);
         const engine = (data.settings.voiceEngine as VoiceEngine) || available[0];
         setVoiceEngine(available.includes(engine) ? engine : available[0]);
+      }
+      if (pendingJd) {
+        setJd(pendingJd);
       }
     } finally {
       setLoading(false);

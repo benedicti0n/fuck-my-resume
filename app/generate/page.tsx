@@ -195,6 +195,7 @@ export default function GeneratePage() {
             latexCode={latexCode}
             resumeData={resumeData}
             highlights={highlights}
+            jobDescription={jd}
           />
           {coldEmail && coldDM && (
             <OutreachPreview email={coldEmail} dm={coldDM} />
